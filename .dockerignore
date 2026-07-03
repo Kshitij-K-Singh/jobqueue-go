@@ -1,6 +1,7 @@
 jobqueue.db
 *.db
 .git
+.github
 tmp
 *.log
 dist/
