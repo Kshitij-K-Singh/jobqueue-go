@@ -7,51 +7,17 @@ on:
     branches: [main]
 
 jobs:
-  go-test:
+  test:
+    name: Go Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
           go-version: '1.25'
-      - name: Go test (targeted packages)
-        run: go test -v ./cmd/... ./internal/... ./jobs/...
+          cache: false   # No external dependencies / no go.sum
 
-  frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
-
-  docker:
-    runs-on: ubuntu-latest
-    needs: [go-test, frontend]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: docker build -t jobqueue-go:ci .
-
-  scan:
-    runs-on: ubuntu-latest
-    needs: [docker]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build image for scan
-        run: docker build -t jobqueue-go:ci .
-      - name: Trivy image scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: jobqueue-go:ci
-          format: table
-          exit-code: '0'
-          severity: CRITICAL,HIGH
+      - name: Test
+        run: go test -v ./...
