@@ -1,0 +1,7 @@
+jobqueue.db
+*.db
+frontend/node_modules
+frontend/dist
+.git
+tmp
+*.log
